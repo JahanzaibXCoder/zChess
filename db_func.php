@@ -1,8 +1,77 @@
 <?php
 
+
+function shoutboxWrite($lobbyId, $nickname, $shoutf)
+{
+	require 'db_config.php';
+	$sql = "SELECT `Rank` FROM `userdata` WHERE Name = '${nickname}'";
+	if($result = mysqli_query($link_db, $sql))
+	{
+		if($row = mysqli_fetch_row($result))
+		{
+		  $rank = $row[0];
+			$sql = "INSERT INTO `Shoutbox`(`LobbyID`, `Name`, `Rank`, `Message`) VALUES ($lobbyId, '$nickname', '$rank', '$shoutf')";
+			if($result = mysqli_query($link_db, $sql))
+			{
+				return true;
+			}
+			else return "Insertion error : $lobbyId, $nickname, $rank, $shoutf";
+			mysqli_free_result($result);
+			mysqli_close($link_db);
+		}
+		mysqli_free_result($result);
+	}
+	return "Selection error";
+	mysqli_close($link_db);
+}
+
+function shoutboxGetCount($lobbyId)
+{
+	require 'db_config.php';
+	$sql = "SELECT COUNT(`ShoutID`) FROM `Shoutbox` WHERE `LobbyID` = ${lobbyId}";
+//	$sql = "SELECT `ShoutID`, `Name`, `Rank`, `Timestamp`, `Message`, `Status` FROM `Shoutbox` WHERE `LobbyID` = ${lobbyId}";
+	if($result = mysqli_query($link_db, $sql))
+	{
+		if($row = mysqli_fetch_row($result))
+		{
+			return $row[0];
+		}
+		else return "Fetch error";
+	}
+	else return "Selection error";
+	mysqli_free_result($result);
+	mysqli_close($link_db);
+}
+
+function shoutboxGetParams($lobbyId, $range = -1)
+{
+	require 'db_config.php';
+	//	$sql = "SELECT lineinfo.numOfLines, `ShoutID`, `Name`, `Rank`, `Timestamp`, `Message`, `Status` FROM `Shoutbox`, (select count(`ShoutID`) as numOfLines FROM Shoutbox) as lineinfo WHERE `LobbyID` = ${lobbyId}";
+	$sql = "SELECT `ShoutID`, `Name`, `Rank`, `Timestamp`, `Message`, `Status` FROM `Shoutbox` WHERE `LobbyID` = ${lobbyId}";
+	if($result = mysqli_query($link_db, $sql))
+	{
+		$arr_of_shoutboxDat = array();
+	//	$data[0][0] = 10;
+		$buffer = 0;
+		$buffermin = 0;
+		while($row = mysqli_fetch_row($result))
+		{
+			$arr_of_shoutboxDat[$buffer] = array($row[0] /*ShoutID*/, $row[1] /*Name*/, $row[2]/*Rank*/, $row[3]/*Timestamp*/, $row[4]/*Message*/, $row[5]/*Status*/);
+			$buffer++;
+			if($range != -1 && $buffer >= $range)
+			{
+				$buffermin = $buffer - $range;
+			}
+		}
+	  return array($arr_of_shoutboxDat, $buffermin /*Starting point*/);
+		mysqli_free_result($result);
+	}
+	mysqli_close($link_db);
+}
+
 function getActiveUserInfo($lobbyId)
 {
-	require_once 'db_config.php';
+	require 'db_config.php';
 	$sql = "SELECT `Name`, `Rank` FROM lobby where LobbyID = ${lobbyId}";
 	if($result = mysqli_query($link_db,$sql))
 	{
@@ -20,51 +89,10 @@ function getActiveUserInfo($lobbyId)
 mysqli_close($link_db);
 }
 
-function onUserLeaveLobby($user)
-{
-	require_once 'db_config.php';
-	$query = "DELETE FROM `lobby` WHERE `Name` = '$user';";
-	if($stmt = mysqli_prepare($link_db, $query))
-	{
-		if(mysqli_stmt_execute($stmt))
-		{
-			mysqli_stmt_store_result($stmt);
-			mysqli_stmt_bind_result($stmt, $rank);
-			return $rank;
-		}
-		mysqli_stmt_close($stmt);
-	}
-	mysqli_close($link_db);
-}
-
-function OnUserJoinLobby($user, $lobbyid)
-{
-	require_once 'db_config.php';
-	$query = "SELECT `Rank` FROM `userdata` WHERE Name = '${user}'";
-	if($stmt = mysqli_prepare($link_db, $query))
-	{
-		if(mysqli_stmt_execute($stmt))
-		{
-			mysqli_stmt_store_result($stmt);
-			mysqli_stmt_bind_result($stmt, $rank);
-			if(mysqli_stmt_fetch($stmt))
-			{
-				$query = "INSERT INTO `lobby`(`LobbyID`, `Name`, `Rank`) VALUES ($lobbyid, '$user', '$rank')";
-				if($result = mysqli_query($link_db, $query))
-				{
-					return true;
-				}
-				else return false;
-			}
-		}
-		mysqli_stmt_close($stmt);
-	}
-	mysqli_close($link_db);
-}
 
 function getUserInfo($name)
 {
-	require_once 'db_config.php';
+	require 'db_config.php';
 	$query = "SELECT * FROM userdata where Name = '$name'";
 	if($result = mysqli_query($link_db,$query))
 	{
@@ -87,9 +115,65 @@ function getUserInfo($name)
 	mysqli_close($link_db);
 	}
 
+	function UpdateRecord($id, $name, $pass, $mail, $rank, $status, $restrict)
+	{
+		  require 'db_config.php';
+			$query = "UPDATE userdata SET `Name`= '$name', `Password`= '$pass', `Email`= '$mail',`Rank`= '$rank',`Status`= '$status',`Restriction`= '$restrict' WHERE `ID` = ${id}";
+			if($result = mysqli_query($link_db, $query))
+			{
+				return true;
+				mysqli_free_result($result);
+			}
+			mysqli_close($link_db);
+	}
+
+
+	function onUserLeaveLobby($user)
+	{
+		require 'db_config.php';
+		$query = "DELETE FROM `lobby` WHERE `Name` = '$user';";
+		if($stmt = mysqli_prepare($link_db, $query))
+		{
+			if(mysqli_stmt_execute($stmt))
+			{
+				mysqli_stmt_store_result($stmt);
+				mysqli_stmt_bind_result($stmt, $rank);
+				return $rank;
+			}
+			mysqli_stmt_close($stmt);
+		}
+		mysqli_close($link_db);
+	}
+
+	function OnUserJoinLobby($user, $lobbyid)
+	{
+		require 'db_config.php';
+		$query = "SELECT `Rank` FROM `userdata` WHERE Name = '${user}'";
+		if($stmt = mysqli_prepare($link_db, $query))
+		{
+			if(mysqli_stmt_execute($stmt))
+			{
+				mysqli_stmt_store_result($stmt);
+				mysqli_stmt_bind_result($stmt, $rank);
+				if(mysqli_stmt_fetch($stmt))
+				{
+					$query = "INSERT INTO `lobby`(`LobbyID`, `Name`, `Rank`) VALUES ($lobbyid, '$user', '$rank')";
+					if($result = mysqli_query($link_db, $query))
+					{
+						return true;
+					}
+					else return false;
+				}
+			}
+			mysqli_stmt_close($stmt);
+		}
+		mysqli_close($link_db);
+	}
+
+
 function _onAccountRegisterRequest($name, $pass, $email, $status, $write_record)
 {
-	require_once 'db_config.php';
+	require 'db_config.php';
 	$query = "SELECT Name FROM userdata WHERE Name = ?";
 	if($stmt = mysqli_prepare($link_db, $query))
 	{
@@ -146,29 +230,10 @@ function _onAccountRegisterRequest($name, $pass, $email, $status, $write_record)
 	mysqli_close($link_db);
 }
 
-function UpdateRecord($id, $name, $pass, $mail, $rank, $status, $restrict)
-{
-	  require_once 'db_config.php';
-		$query = "UPDATE userdata SET `Name`= '$name', `Password`= '$pass', `Email`= '$mail',`Rank`= '$rank',`Status`= '$status',`Restriction`= '$restrict' WHERE `ID` = ${id}";
-		if($result = mysqli_query($link_db, $query))
-		{
-			return true;
-			mysqli_free_result($result);
-		}
-		mysqli_close($link_db);
-}
-/*	if($stmt = mysqli_prepare($link_db, $query))
-	{
-		mysqli_stmt_bind_param($stmt, "ss", '$name', '$pass', '$mail', '$rank', '$status', '$restrict');
-		if(mysqli_stmt_execute($stmt))
-		{
-			return true;
-		}
-		mysqli_stmt_close($stmt);
-	}*/
+
 function _OnAccountLoginAttempt($name, $pass)
 {
-  require_once 'db_config.php';
+  require 'db_config.php';
 	$query = "SELECT ID, Name, Password FROM userdata WHERE Name = ? AND Password = ?";
 	if($stmt = mysqli_prepare($link_db, $query))
 	{
@@ -216,7 +281,7 @@ function _OnAccountLoginAttempt($name, $pass)
 
 function _onAccountDisconnect($name)
 {
-  require_once 'db_config.php';
+  require 'db_config.php';
 	$query = "SELECT Name FROM userdata WHERE Name = ?";
 	if($stmt = mysqli_prepare($link_db, $query))
 	{

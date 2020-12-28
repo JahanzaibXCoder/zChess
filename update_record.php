@@ -19,7 +19,6 @@ session_start();
       if(isset($_SESSION['Rank']) && $_SESSION['Rank'] == "Moderator")
       {
         $id = $_POST['pid'];
-        if($name == $_SESSION['name'])
   			$name = test_input($_POST['cname']);
   			$pass = test_input($_POST['cpass']);
   			$mail = test_input($_POST['cmail']);
@@ -29,7 +28,9 @@ session_start();
         include_once 'db_func.php';
         if(UpdateRecord($id, $name, $pass, $mail, $rank, $status, $restrict))
         {
-          header("Location:lobby.php?task=1");
+          $lobbyid = $_SESSION['lobbyid'];
+          $user = $_SESSION['name'];
+          header("Location:lobby.php?lobbyid=$lobbyid&user=$user");
         }
         else header("Location:manageprofile.php?profile=$name&err=404");
       }

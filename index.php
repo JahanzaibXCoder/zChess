@@ -91,7 +91,7 @@ echo "<script> console.log('${ip_addr}'); </script>";
 
 				<button onclick = 'gotolobby()'> Enter lobby </button>
 
-				<button onclick = 'gotolobby()'> Singleplayer </button>
+				<button onclick = 'gotolobbysp()'> Singleplayer </button>
 				<div id = 'intro1' class = 'introElement'> - </div>
 				<div id = 'intro2' class = 'introElement'> - </div>
 				<div id = 'intro3' class = 'introElement'> - </div>
@@ -156,6 +156,10 @@ echo "<script> console.log('${ip_addr}'); </script>";
 					{
 						window.location.href="lobby.php?lobbyid="+focus+"&user=<?php if(isset($_SESSION['Loggedin']) && $_SESSION['Loggedin'] == true) { echo $_SESSION['name']; } ?>";
 
+					}
+					function gotolobbysp()
+					{
+						window.location.href="chess.php";
 					}
 					</script>
 			</div>

@@ -1,4 +1,9 @@
-<?php 
+<?php
+/*******************************************************************************
+********************************************************************************
+                    To be worked on !
+*******************************************************************************
+********************************************************************************/
 define('INACTIVE_LIMIT_IN_SECONDS', 10);
 
 $_SESSION['session_check_duration'] = 10;
@@ -33,7 +38,7 @@ function _onsessionExpire_sync()
     $_SESSION['name'] = 'HEHE';
 }
 
-echo "function session_update_sync()
+function session_update_sync()
 {
     if(!$_SESSION['session_check_activity'])
     {
@@ -42,12 +47,12 @@ echo "function session_update_sync()
         {
             _onsessionExpire_sync();
         }
-    
+
     }
-    else 
-    { 
-        refresh_session_sync(); 
+    else
+    {
+        refresh_session_sync();
     }
-}";
+}
 
 ?>

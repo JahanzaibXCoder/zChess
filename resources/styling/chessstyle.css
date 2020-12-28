@@ -1,0 +1,181 @@
+
+.dropables
+{
+	color: black;
+	background-color: black;
+	opacity: 0.4;
+	position : absolute;
+	transition : 0.5s;
+	transform : scale(-0.9, -0.9);
+}
+
+
+.teamWhite
+{
+	position : relative;
+}
+
+.teamBlack
+{
+ 	position : relative;
+}
+
+.red
+{
+	background-color: red;
+}
+
+
+
+/*.characters
+{
+
+}*/
+
+.charConfigPawn
+{
+	position : relative;
+	width : 75%;
+	transform : scale(1.1,1.1);
+	z-index:1000;
+	padding-left:4px;
+}
+
+.charConfig
+{
+
+	width : 75%;
+	position : relative;
+	transform : scale(1.5, 1.5);
+	z-index:1000;
+	padding-left:3px;
+}
+
+
+.board
+{
+	float:left;
+	background-color: black;
+	height : 100px;
+	width : auto;
+	margin-top: 2%;
+	background-color: transparent;
+
+}
+#clock
+{
+	margin-top:-8%;
+	margin-left:35%;
+	height: 77vh;
+	width: 20%;
+	float:left;
+	background-color: transparent;
+	position:absolute;
+	top:142px;
+}
+
+.loader{
+    transform: translate(-50%, -50%);
+    width: 307px;
+    height: 307px;
+    box-sizing: border-box;
+    z-index : 1000;
+		position: fixed;
+		top:248px;
+		left: 645px;
+		box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+}
+
+.Time{
+	position: relative;
+	float:left;
+	color : white;
+	margin-left : 115px;
+	margin-top: 45px;
+	letter-spacing : 2px;
+	font-size : 24px;
+	font-family: Monospace;
+	top : 90px;
+}
+
+#wTime
+{
+	color: white;
+}
+#wCircle
+{
+	background-color: black;
+}
+
+#bTime
+{
+	color: brown;
+}
+#bCircle
+{
+	background-color: black;
+}
+
+
+.loader .face{
+    position: absolute;
+    border: 2px solid #121212;
+
+}
+
+.loader .face.face3{
+    top: 60px;
+    left: 60px;
+    bottom: 60px;
+    right: 60px;
+    background: #090909;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+    border-radius: 50%;
+    border-top: 2px solid #0000ff;
+	  border-left: 2px solid #0000ff;
+}
+
+
+.loader .face .circle{
+    position: absolute;
+    top: calc(50% - 1px);
+    left: 50%;
+    width: 50%;
+    height: 2px;
+    /*background: #fff;*/
+    transform-origin: left;
+}
+
+.loader .face.face3 .circle{
+    transform: rotate(-45deg);
+}
+.loader .face .circle:before{
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+ 		top: -4px;
+    right: -6px;
+
+}
+
+.loader .face.face3 .circle:before{
+    background: #0000ff;
+    box-shadow: 0 0 20px #00f,
+                0 0 40px #00f,
+                0 0 60px #00f,
+                0 0 80px #00f,
+                0 0 100px #00f,
+                0 0 0 5px rgba(0, 0, 255, 0.1);
+
+}
+@keyframes animate{
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
